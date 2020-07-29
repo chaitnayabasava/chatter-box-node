@@ -1,23 +1,37 @@
 const express = require('express');
-const socket = require('socket.io');
+const bodyParser = require("body-parser");
+const mongoose = require('mongoose');
+
+const appServer = require("./app");
+const secret = require("./secret");
+const registerController = require("./controllers/register");
+const loginController = require("./controllers/login");
 
 const app = express();
-const port = process.env.PORT || 3000;
-const server = app.listen(port, function() {
-    console.log(`listening on ${port}`);
+
+app.use(bodyParser.json());
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    next();
 });
 
-const io = socket(server);
+app.post('/register', registerController);
+app.post('/login', loginController);
 
-io.on('connection', function(socket) {
-    socket.on('message', (data) => {
-        socket.broadcast.emit('message', {
-            from: data.from,
-            mssg: data.msg
-        });
-    });
+app.use((error, req, res, next) => {
+    const status = error.statusCode || 500;
+    const message = error.message;
+    res.status(status).json({ message: message });
+});
 
-    socket.on('typing', (data) => {
-        socket.broadcast.emit('typing', {from: data.from});
-    })
+
+mongoose.connect(secret.mongodb_uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
 })
+.then(result => {
+    appServer(app);
+})
+.catch(err => console.log(err));
