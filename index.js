@@ -6,6 +6,7 @@ const appServer = require("./app");
 const secret = require("./secret");
 const registerController = require("./controllers/register");
 const loginController = require("./controllers/login");
+const { checkAuth } = require('./controllers/authorization');
 
 const app = express();
 
@@ -20,12 +21,17 @@ app.use((req, res, next) => {
 app.post('/register', registerController);
 app.post('/login', loginController);
 
+app.get('/checkAuth', checkAuth, (req, res, next) => {
+    console.log(req.userId);
+    res.json(true);
+})
+
 app.use((error, req, res, next) => {
     const status = error.statusCode || 500;
     const message = error.message;
+    console.log(message);
     res.status(status).json({ message: message });
 });
-
 
 mongoose.connect(secret.mongodb_uri, {
     useUnifiedTopology: true,

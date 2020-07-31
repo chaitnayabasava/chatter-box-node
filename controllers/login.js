@@ -31,7 +31,11 @@ const signin = (req, res, next) => {
                 err.statusCode = 404;
                 next(err);
             } else {
-                const auth_token = jwt.sign({username: result.username}, secret.jwt_token);
+                const auth_token = jwt.sign({
+                    userId: result._id,
+                    userName: result.username,
+                    exp: Math.floor(Date.now() / 1000) + (60 * 60)
+                }, secret.jwt_token);
                 const data = {...result._doc};
                 delete data.password;
 
