@@ -1,12 +1,12 @@
 const Joi = require('joi');
 
 const schema = Joi.object({
-    username: Joi.string()
-            .required(),
-    
-    password: Joi.string()
-            .min(8)
-            .required()
-})
+  username: Joi.string()
+    .required(),
 
-module.exports = schema
+  password: Joi.string()
+    .min(8)
+    .required(),
+});
+
+module.exports = schema;
