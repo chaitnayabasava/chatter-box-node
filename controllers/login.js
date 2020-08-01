@@ -5,7 +5,7 @@ const loginSchema = require("../validators/login");
 const secret = require('../secret');
 const User = require("../models/User");
 
-const signin = (req, res, next) => {
+module.exports = (req, res, next) => {
     const data = req.body;
     const result = loginSchema.validate(data);
     if(result.error) {
@@ -49,5 +49,3 @@ const signin = (req, res, next) => {
         next(err);
     })
 }
-
-module.exports = signin;

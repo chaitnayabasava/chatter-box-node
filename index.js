@@ -6,6 +6,7 @@ const appServer = require("./app");
 const secret = require("./secret");
 const registerController = require("./controllers/register");
 const loginController = require("./controllers/login");
+const searchController = require("./controllers/search");
 const { checkAuth } = require('./controllers/authorization');
 
 const app = express();
@@ -20,11 +21,8 @@ app.use((req, res, next) => {
 
 app.post('/register', registerController);
 app.post('/login', loginController);
-
-app.get('/checkAuth', checkAuth, (req, res, next) => {
-    console.log(req.userId);
-    res.json(true);
-})
+app.post('/search', checkAuth, searchController);
+app.get('/checkAuth', checkAuth, (req, res, next) => res.json(true));
 
 app.use((error, req, res, next) => {
     const status = error.statusCode || 500;

@@ -5,7 +5,7 @@ const registerSchema = require("../validators/register");
 const secret = require('../secret');
 const User = require("../models/User");
 
-const signup = (req, res, next) => {
+module.exports = (req, res, next) => {
     const data = req.body;
     const result = registerSchema.validate(data);
     if(result.error) {
@@ -41,5 +41,3 @@ const signup = (req, res, next) => {
         next(err);
     });
 }
-
-module.exports = signup;
