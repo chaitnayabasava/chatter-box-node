@@ -6,8 +6,7 @@ checkAuth = (req, res, next) => {
     try{
         decodeToken = jwt.verify(req.headers.authorization, jwt_token);
     } catch(err) {
-        if(err.message == "jwt must be provided") err.statusCode = 401;
-        if(!err.statusCode) err.statusCode = 500;
+        err.statusCode = 401;
         throw err;
     }
 
