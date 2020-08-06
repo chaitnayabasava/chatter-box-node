@@ -1,4 +1,6 @@
+/* eslint-disable no-underscore-dangle */
 const socket = require('socket.io');
+const { recentConnect } = require('./controllers/handle-connections');
 
 module.exports = (app) => {
   const port = process.env.PORT || 3000;
@@ -7,16 +9,18 @@ module.exports = (app) => {
   });
 
   const io = socket(server);
+  const connections = {};
 
   io.on('connection', (soc) => {
-    console.log(soc.id);
-    soc.on('message', (data) => {
-      soc.broadcast.emit('message', { ...data });
-    });
+    soc.on('established', (id) => { connections[id] = soc.id; });
 
-    soc.on('typing', (data) => {
-      soc.broadcast.emit('typing', { from: data.from });
-    });
+    soc.on('new-connect', recentConnect);
+
+    soc.on('closed', (id) => { delete connections[id]; });
+
+    soc.on('message', (data) => { soc.to(connections[data.to._id]).emit('message', { ...data }); });
+
+    soc.on('typing', (data) => { soc.to(connections[data.to._id]).emit('typing', { from: data.from }); });
 
     soc.on('disconnect', () => console.log('user disconnected'));
   });

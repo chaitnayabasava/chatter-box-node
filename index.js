@@ -8,6 +8,7 @@ const registerController = require('./controllers/register');
 const loginController = require('./controllers/login');
 const searchController = require('./controllers/search');
 const { checkAuth } = require('./controllers/authorization');
+const { getRecentConnection } = require('./controllers/handle-connections');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use((req, res, next) => {
 app.post('/register', registerController);
 app.post('/login', loginController);
 app.post('/search', checkAuth, searchController);
+app.post('/recents', checkAuth, getRecentConnection);
 app.get('/checkAuth', checkAuth, (req, res) => res.json(true));
 
 app.use((error, req, res, next) => {
