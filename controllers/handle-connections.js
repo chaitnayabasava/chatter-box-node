@@ -1,17 +1,22 @@
 /* eslint-disable no-underscore-dangle */
 const Recent = require('../models/RecentChats');
 
-const recentConnect = (data) => {
-  Recent.findById(data.from._id)
+const createConnection = (id1, id2) => {
+  Recent.findById(id1)
     .then((u) => {
       if (!u) {
-        const temp = Recent({ _id: data.from._id });
+        const temp = Recent({ _id: id1 });
         return temp.save();
       }
       return u;
     })
-    .then((u) => u.newConnection(data.to._id))
+    .then((u) => u.newConnection(id2))
     .catch((err) => console.log(err));
+};
+
+const recentConnect = (data) => {
+  createConnection(data.from._id, data.to._id);
+  createConnection(data.to._id, data.from._id);
 };
 
 const getRecentConnection = (req, res, next) => {
@@ -19,11 +24,11 @@ const getRecentConnection = (req, res, next) => {
   Recent.findById(data._id)
     .populate('connected', '_id username')
     .then((u) => {
+      let temp = [];
       if (u) {
-        res.json(u.connected);
-        return;
+        temp = u.connected;
       }
-      res.json([]);
+      res.json({ data: temp });
     })
     .catch((err) => {
       next(err);
