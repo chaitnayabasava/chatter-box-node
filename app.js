@@ -18,10 +18,15 @@ module.exports = (app) => {
 
     soc.on('closed', (id) => { delete connections[id]; });
 
-    soc.on('message', (data) => { soc.to(connections[data.to._id]).emit('message', { ...data }); });
+    soc.on('message', (data) => {
+      if (!data.to) return;
+      soc.to(connections[data.to._id]).emit('message', { ...data });
+    });
 
-    soc.on('typing', (data) => { soc.to(connections[data.to._id]).emit('typing', { from: data.from }); });
-
-    soc.on('disconnect', () => console.log('user disconnected'));
+    soc.on('typing', (data) => {
+      if (!data.to) return;
+      if (data.tag) recentConnect(data);
+      soc.to(connections[data.to._id]).emit('typing', { from: data.from });
+    });
   });
 };
